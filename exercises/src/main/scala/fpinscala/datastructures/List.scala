@@ -23,25 +23,28 @@ object List { // `List` companion object. Contains functions for creating and wo
     if (as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*))
 
-  val x = List(1,2,3,4,5) match {
-    case Cons(x, Cons(2, Cons(4, _))) => x
-    case Nil => 42
-    case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
-    case Cons(h, t) => h + sum(t)
-    case _ => 101
-  }
+//  val x = List(1,2,3,4,5) match {
+//    case Cons(x, Cons(2, Cons(4, _))) => x
+//    case Nil => 42
+//    case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
+//    case Cons(h, t) => h + sum(t)
+//    case _ => 101
+//  }
+
+//  def append[A](a1: List[A], a2: List[A]): List[A] =
+//    a1 match {
+//      case Nil => a2
+//      case Cons(h,t) => Cons(h, append(t, a2))
+//    }
 
   def append[A](a1: List[A], a2: List[A]): List[A] =
-    a1 match {
-      case Nil => a2
-      case Cons(h,t) => Cons(h, append(t, a2))
-    }
+    foldRight(a1, a2)(Cons(_, _))
 
-  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B = // Utility functions
-    as match {
-      case Nil => z
-      case Cons(x, xs) => f(x, foldRight(xs, z)(f))
-    }
+//  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B = // Utility functions
+//    as match {
+//      case Nil => z
+//      case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+//    }
 
   def sum2(ns: List[Int]) =
     foldRight(ns, 0)((x,y) => x + y)
@@ -92,5 +95,39 @@ object List { // `List` companion object. Contains functions for creating and wo
   def map[A,B](l: List[A])(f: A => B): List[B] = l match {
     case Nil => Nil
     case Cons(head, tail) => Cons(f(head), map(tail)(f))
+  }
+
+  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B =
+    foldLeft(reverse(as), z)((x,y) => f(y, x))
+
+  def reverse[A](l: List[A]): List[A] = {
+    def doit(a: List[A], b: List[A]): List[A] = b match {
+      case Cons(head, tail) => doit(Cons(head, a), tail)
+      case Nil => a
+    }
+    doit(Nil, l)
+  }
+
+  def flatten[A](l: List[List[A]]): List[A] = l match {
+    case Nil => Nil
+    case Cons(head, tail) => append(head, flatten(tail))
+  }
+
+//  def filter[A](l: List[A])(f: A => Boolean): List[A] = l match {
+//    case Nil => Nil
+//    case Cons(head, tail) if f(head) => Cons(head, filter(tail)(f))
+//    case Cons(_, tail) => filter(tail)(f)
+//  }
+
+  def flatMap[A, B](l: List[A])(f: A => List[B]): List[B] =
+    flatten(map(l)(f))
+
+  def filter[A](l: List[A])(f: A => Boolean): List[A] =
+    flatMap(l)(x => if(f(x)) List(x) else Nil)
+
+  def zipWith[A, B, C](l1: List[A], l2: List[B])(f: (A, B) => C): List[C] = (l1, l2) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(x, xs), Cons(y, ys)) => Cons(f(x, y), zipWith(xs, ys)(f))
   }
 }

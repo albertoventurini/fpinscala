@@ -50,4 +50,24 @@ class ListTests extends FunSuite {
     assert(List.map(List(1, 2, 3, 4))( x => x * x) == List(1, 4, 9, 16))
   }
 
+  test("reverse works") {
+    assert(List.reverse(List(1, 2, 3)) == List(3, 2, 1))
+  }
+
+  test("flatten works") {
+    assert(flatten(List(List(1, 2), List(3, 4))) == List(1,2,3,4))
+  }
+
+  test("filter works") {
+    assert(filter(List(1,2,3,4,5,6))(_ % 2 == 0) == List(2,4,6))
+  }
+
+  test("flatmap works") {
+    assert(flatMap(List(1, 2, 3))(x => List(x, x, x)) == List(1, 1, 1, 2, 2, 2, 3, 3, 3))
+  }
+
+  test("zipWith works") {
+    assert(zipWith(List(1,2,3), List(4,5,6))(_ + _) == List(5, 7, 9))
+  }
+
 }
